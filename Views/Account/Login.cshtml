@@ -1,0 +1,31 @@
+﻿@model VeterinaryClinic.View_Models.LoginViewModel
+
+<div class="form-container">
+    <h2>Login</h2>
+
+    <form asp-action="Login" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group form-check">
+            <input asp-for="RememberMe" class="form-check-input" />
+            <label asp-for="RememberMe" class="form-check-label">Remember me</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-custom">Login</button>
+    </form>
+
+    <a asp-action="ForgotPassword" class="link-custom">Forgot your password? Click here</a>
+    <a asp-action="Register" class="link-custom">Don't have an account? Register here</a>
+</div>
