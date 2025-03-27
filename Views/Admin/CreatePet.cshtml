@@ -1,0 +1,81 @@
+﻿@model VeterinaryClinic.ViewModels.PetCreateViewModel
+@{
+    ViewData["Title"] = "Create New Pet";
+}
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">@ViewData["Title"]</h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="CreatePet" method="post" id="petCreateForm">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+            <!-- Owner Dropdown -->
+            <div class="form-group">
+                <label asp-for="OwnerId" class="control-label"></label>
+                <select asp-for="OwnerId" asp-items="Model.OwnerOptions" class="form-control">
+                    <option value="">-- Select Owner --</option>
+                </select>
+                <span asp-validation-for="OwnerId" class="text-danger"></span>
+            </div>
+
+            <!-- Pet Name -->
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="Enter pet name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <!-- Age -->
+            <div class="form-group">
+                <label asp-for="Age" class="control-label"></label>
+                <input asp-for="Age" type="number" class="form-control" min="0" max="50" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <!-- Animal Type -->
+            <div class="form-group">
+                <label asp-for="AnimalType" class="control-label"></label>
+                <select asp-for="AnimalType" asp-items="Model.AnimalTypeOptions" class="form-control">
+                    <option value="">-- Select Animal Type --</option>
+                </select>
+                <span asp-validation-for="AnimalType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="SelectedVaccineIds" class="form-label">Vaccines (Optional)</label>
+                <select asp-for="SelectedVaccineIds" asp-items="Model.VaccineOptions"
+                        class="form-control" multiple>
+                    <option value="">-- Select Vaccines --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Pet
+                </button>
+                <a asp-controller="Account" asp-action="Profile" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            $('#petCreateForm').submit(function() {
+                $('button[type="submit"]').prop('disabled', true)
+                    .html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+            });
+        });
+    </script>
+}

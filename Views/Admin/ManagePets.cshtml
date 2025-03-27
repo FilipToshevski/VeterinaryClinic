@@ -1,0 +1,130 @@
+﻿@model VeterinaryClinic.ViewModels.AdminPetsViewModel
+
+<div class="admin-pets-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-paw me-2"></i>Manage All Pets</h2>
+        <a asp-controller="Admin" asp-action="CreatePet" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add New Pet
+        </a>
+        <a asp-controller="Account" asp-action="Profile" class="btn btn-light">
+            <i class="fas fa-arrow-left me-2"></i> Back to Profile
+        </a>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" asp-action="ManagePets" class="row g-3">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control"
+                               asp-for="SearchTerm"
+                               placeholder="Search by owner, pet name or type...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-2"></i>Filter
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a asp-action="ManagePets" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-times me-2"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Owner</th>
+                            <th>Email</th>
+                            <th>Pet Name</th>
+                            <th>Type</th>
+                            <th>Age</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var owner in Model.OwnersWithPets)
+                        {
+                            @foreach (var pet in owner.Pets)
+                            {
+                                <tr>
+                                    <td>@owner.OwnerName</td>
+                                    <td>@owner.OwnerEmail</td>
+                                    <td>@pet.Name</td>
+                                    <td><span class="badge bg-primary">@pet.AnimalType</span></td>
+                                    <td>@pet.Age @(pet.Age == 1 ? "year" : "years")</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-controller="Admin" asp-action="EditPet" asp-route-id="@pet.PetId"
+                                               class="btn btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form asp-controller="Admin" asp-action="DeletePet" asp-route-id="@pet.PetId"
+                                                  onsubmit="return confirm('Are you sure you want to delete this pet?');">
+                                                <button type="submit" class="btn btn-outline-danger">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-pets-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .badge {
+        font-size: 0.85em;
+        padding: 5px 8px;
+    }
+
+    .btn-group-sm > .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+    }
+
+    .table-responsive {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .admin-pets-container {
+        max-width: 1400px;
+    }
+</style>
