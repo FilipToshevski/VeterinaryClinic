@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VeterinaryClinic.Attributes;
 
 namespace VeterinaryClinic.ViewModels
 {
@@ -36,8 +37,10 @@ namespace VeterinaryClinic.ViewModels
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
+        [Required]
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date)]
+        [AgeRange(18, 100)]
         public DateTime? DateOfBirth { get; set; }
     }
 }

@@ -12,8 +12,8 @@ using VeterinaryClinic.Data;
 namespace VeterinaryClinic.Migrations
 {
     [DbContext(typeof(VeterinaryClinicDb))]
-    [Migration("20250326180736_AddAnimalTypeToPet")]
-    partial class AddAnimalTypeToPet
+    [Migration("20250327143023_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,7 +177,7 @@ namespace VeterinaryClinic.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -224,9 +224,6 @@ namespace VeterinaryClinic.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -244,7 +241,25 @@ namespace VeterinaryClinic.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("VeterinaryClinic.Models.Pet", b =>
+            modelBuilder.Entity("VeterinaryClinic.Models.PetVaccine", b =>
+                {
+                    b.Property<int>("PetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VaccineId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateAdministered")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PetId", "VaccineId");
+
+                    b.HasIndex("VaccineId");
+
+                    b.ToTable("PetVaccines");
+                });
+
+            modelBuilder.Entity("VeterinaryClinic.Models.Pets", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -273,21 +288,6 @@ namespace VeterinaryClinic.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Pets");
-                });
-
-            modelBuilder.Entity("VeterinaryClinic.Models.PetVaccine", b =>
-                {
-                    b.Property<int>("PetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VaccineId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PetId", "VaccineId");
-
-                    b.HasIndex("VaccineId");
-
-                    b.ToTable("PetVaccine");
                 });
 
             modelBuilder.Entity("VeterinaryClinic.Models.Vaccine", b =>
@@ -358,20 +358,9 @@ namespace VeterinaryClinic.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("VeterinaryClinic.Models.Pet", b =>
-                {
-                    b.HasOne("VeterinaryClinic.Models.Owner", "Owner")
-                        .WithMany("Pets")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Owner");
-                });
-
             modelBuilder.Entity("VeterinaryClinic.Models.PetVaccine", b =>
                 {
-                    b.HasOne("VeterinaryClinic.Models.Pet", "Pet")
+                    b.HasOne("VeterinaryClinic.Models.Pets", "Pet")
                         .WithMany("PetVaccines")
                         .HasForeignKey("PetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -388,12 +377,23 @@ namespace VeterinaryClinic.Migrations
                     b.Navigation("Vaccine");
                 });
 
+            modelBuilder.Entity("VeterinaryClinic.Models.Pets", b =>
+                {
+                    b.HasOne("VeterinaryClinic.Models.Owner", "Owner")
+                        .WithMany("Pets")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
             modelBuilder.Entity("VeterinaryClinic.Models.Owner", b =>
                 {
                     b.Navigation("Pets");
                 });
 
-            modelBuilder.Entity("VeterinaryClinic.Models.Pet", b =>
+            modelBuilder.Entity("VeterinaryClinic.Models.Pets", b =>
                 {
                     b.Navigation("PetVaccines");
                 });

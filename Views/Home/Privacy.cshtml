@@ -1,6 +1,53 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
+    Layout = "_Layout"; // Replace with your layout file if different
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container py-5">
+    <h1 class="mb-4">Privacy Policy</h1>
+    <p class="text-muted mb-4">Last Updated: @DateTime.Now.ToString("MMMM dd, yyyy")</p>
+
+    <div class="privacy-policy-content bg-light p-4 rounded">
+        <section class="mb-5">
+            <h2 class="h4 mb-3">Information We Collect</h2>
+            <h3 class="h5 mb-2">A. Personal Information</h3>
+            <p>We may collect the following personal information when you use our Web App:</p>
+            <ul>
+                <li><strong>Owner Information:</strong> Name, email address, phone number, home address, and payment details.</li>
+                <li><strong>Pet Information:</strong> Pet name, species, breed, age, medical history, vaccination records, and treatment details.</li>
+                <li><strong>Account Information:</strong> Username, password, and security questions for account access.</li>
+            </ul>
+
+            <h3 class="h5 mb-2">B. Automatically Collected Data</h3>
+            <p>When you use our Web App, we may automatically collect:</p>
+            <ul>
+                <li><strong>Device Information:</strong> IP address, browser type, operating system, and device identifiers.</li>
+                <li><strong>Usage Data:</strong> Pages visited, time spent, features used, and interactions with the app.</li>
+                <li><strong>Cookies & Tracking Technologies:</strong> We may use cookies and similar tracking tools to enhance user experience and analyze trends.</li>
+            </ul>
+        </section>
+
+        <section class="mb-5">
+            <h2 class="h4 mb-3">How We Use Your Information</h2>
+            <p>We use the collected information for the following purposes:</p>
+            <ul>
+                <li>To provide veterinary services, manage appointments, and process payments.</li>
+                <li>To maintain accurate pet medical records and treatment plans.</li>
+                <li>To communicate with you about appointments, reminders, and follow-ups.</li>
+                <li>To improve our Web App's functionality, security, and user experience.</li>
+                <li>To comply with legal obligations and veterinary regulations.</li>
+            </ul>
+        </section>
+
+        <section class="mb-5">
+            <h2 class="h4 mb-3">Contact Us</h2>
+            <p>For privacy-related questions or concerns, please contact:</p>
+            <address>
+                <strong>@ViewData["ClinicName"]</strong><br>
+                @ViewData["ClinicAddress"]<br>
+                Email: <a href="mailto:@ViewData["ClinicEmail"]">@ViewData["ClinicEmail"]</a><br>
+                Phone: @ViewData["ClinicPhone"]
+            </address>
+        </section>
+    </div>
+</div>

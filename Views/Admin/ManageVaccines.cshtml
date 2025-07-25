@@ -1,54 +1,267 @@
 ﻿@model List<VeterinaryClinic.Models.Vaccine>
+@{
+    ViewData["Title"] = "Manage Vaccines";
+}
 
-<div class="container mt-4">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h3><i class="fas fa-syringe me-2"></i>Manage Vaccines</h3>
-            <a asp-controller="Account" asp-action="Profile" class="btn btn-light">
-                <i class="fas fa-arrow-left me-2"></i> Back to Profile
-            </a>
+<div class="container py-4">
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-syringe me-2"></i>@ViewData["Title"]
+                </h3>
+                <a asp-controller="Account" asp-action="Profile" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Profile
+                </a>
+            </div>
         </div>
-        <div class="card-body">
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-            }
 
-            <form asp-action="AddVaccine" method="post" class="mb-4">
-                <div class="input-group">
-                    <input type="text" name="vaccineName" class="form-control"
-                           placeholder="Enter new vaccine name" required>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Add Vaccine
-                    </button>
-                </div>
-            </form>
+        <div class="card-body p-4">
+            <!-- Alert Messages Container -->
+            <div id="alertContainer">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+            </div>
 
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Vaccine Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var vaccine in Model)
-                    {
-                        <tr>
-                            <td>@vaccine.Name</td>
-                            <td>
-                                <form asp-action="DeleteVaccine" method="post"
-                                      onsubmit="return confirm('Are you sure you want to delete this vaccine?');">
-                                    <input type="hidden" name="id" value="@vaccine.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <!-- Add Vaccine Form -->
+            <div class="mb-4 p-3 bg-light rounded">
+                <h5 class="mb-3 text-primary">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Vaccine
+                </h5>
+                <form id="addVaccineForm" class="row g-3 needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div class="col-md-8 position-relative">
+                        <input type="text" id="vaccineName" name="vaccineName"
+                               class="form-control form-control-lg"
+                               placeholder="Enter vaccine name" required
+                               minlength="2" maxlength="50">
+                        <div class="invalid-tooltip">
+                            Please enter a valid vaccine name (2-50 characters).
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success btn-lg w-100" id="submitVaccineBtn">
+                            <i class="fas fa-plus me-2"></i> Add Vaccine
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Vaccines Table -->
+            <div id="vaccinesTableContainer">
+                @await Html.PartialAsync("_VaccinesTablePartial", Model)
+            </div>
+        </div>
+
+        <div class="card-footer bg-light py-3 d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                <span id="vaccineCount">@Model.Count</span> vaccine(s) registered
+            </small>
+            <small class="text-muted">
+                Last updated: <span id="lastUpdated">@DateTime.Now.ToString("MMM dd, yyyy hh:mm tt")</span>
+            </small>
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .invalid-tooltip {
+            position: absolute;
+            top: 100%;
+            z-index: 5;
+            display: none;
+            max-width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.1rem;
+            font-size: 0.875rem;
+            color: #fff;
+            background-color: var(--bs-danger);
+            border-radius: 0.375rem;
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-tooltip,
+        .was-validated .form-control:invalid ~ .invalid-feedback {
+            display: block;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize form validation and auto-focus
+            initVaccineForm();
+
+            // Set up alert timeout
+            initAlerts();
+
+            // Set up AJAX form submission
+            initAjaxFormSubmission();
+
+            // Function to initialize form validation
+            function initVaccineForm() {
+                $('#vaccineName').focus();
+
+                // Client-side validation
+                $('#addVaccineForm').on('submit', function(e) {
+                    if (!this.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        $(this).addClass('was-validated');
+                        return false;
+                    }
+                    return true;
+                });
+            }
+
+            // Function to handle alerts
+            function initAlerts() {
+                // Auto-dismiss alerts after 5 seconds
+                setTimeout(function() {
+                    $('.alert').fadeOut('slow', function() {
+                        $(this).alert('close');
+                    });
+                }, 5000);
+
+                // Close button functionality
+                $(document).on('click', '.alert .btn-close', function() {
+                    $(this).closest('.alert').fadeOut('slow', function() {
+                        $(this).alert('close');
+                    });
+                });
+            }
+
+            // Function to handle AJAX form submission
+            function initAjaxFormSubmission() {
+                $('#addVaccineForm').on('submit', function(e) {
+                    e.preventDefault();
+
+                    if (!this.checkValidity()) {
+                        $(this).addClass('was-validated');
+                        return false;
+                    }
+
+                    var form = $(this);
+                    var submitBtn = $('#submitVaccineBtn');
+                    var originalBtnText = submitBtn.html();
+
+                    // Show loading state
+                    submitBtn.prop('disabled', true)
+                           .html('<i class="fas fa-spinner fa-spin me-2"></i>Adding...');
+
+                    $.ajax({
+                        url: '@Url.Action("CreateVaccine", "Admin")', // Changed from "AddVaccine" to "CreateVaccine"
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function(response) {
+                            if (response.success) {
+                                showAlert(response.message, 'success');
+                                refreshVaccinesTable();
+                                form[0].reset();
+                                form.removeClass('was-validated');
+                                $('#vaccineName').focus();
+                            } else {
+                                showAlert(response.message || 'Operation failed', 'danger');
+                            }
+                        },
+                        error: function(xhr) {
+                            var errorMsg = parseAjaxError(xhr);
+                            showAlert(errorMsg, 'danger');
+                            console.error('AJAX Error:', xhr.responseText);
+                        },
+                        complete: function() {
+                            submitBtn.prop('disabled', false).html(originalBtnText);
+                        }
+                    });
+                });
+            }
+
+            // Function to parse AJAX errors
+            function parseAjaxError(xhr) {
+                try {
+                    if (xhr.responseJSON) {
+                        return xhr.responseJSON.message ||
+                               xhr.responseJSON.title ||
+                               JSON.stringify(xhr.responseJSON);
+                    }
+                    return xhr.statusText || 'Request failed';
+                } catch (e) {
+                    console.error('Error parsing error response:', e);
+                    return 'An unexpected error occurred';
+                }
+            }
+
+            // Function to refresh vaccines table
+            function refreshVaccinesTable() {
+                $.get('@Url.Action("GetVaccinesTable", "Admin")')
+                    .done(function(data) {
+                        $('#vaccinesTableContainer').html(data);
+                        updateVaccineCount();
+                        updateLastUpdatedTime();
+                    })
+                    .fail(function(xhr) {
+                        showAlert('Error refreshing vaccine list: ' + parseAjaxError(xhr), 'warning');
+                    });
+            }
+
+            // Function to update vaccine count
+            function updateVaccineCount() {
+                var count = $('#vaccinesTableContainer tbody tr').length;
+                $('#vaccineCount').text(count);
+            }
+
+            // Function to update last updated time
+            function updateLastUpdatedTime() {
+                var now = new Date();
+                $('#lastUpdated').text(now.toLocaleString());
+            }
+
+            // Function to show alert messages
+            function showAlert(message, type) {
+                var icon = type === 'success' ? 'fa-check-circle' :
+                           type === 'danger' ? 'fa-exclamation-circle' :
+                           'fa-info-circle';
+
+                var alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show mb-3" role="alert">
+                        <i class="fas ${icon} me-2"></i>${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+
+                $('#alertContainer').prepend(alertHtml);
+                setTimeout(function() {
+                    $('.alert').not(':last').alert('close');
+                }, 5000);
+            }
+        });
+    </script>
+}

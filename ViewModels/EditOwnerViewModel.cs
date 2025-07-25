@@ -23,6 +23,7 @@
             [Display(Name = "Last Name")]
             public string LastName { get; set; }
 
+            [Required(ErrorMessage = "Date of birth is required")]
             [Display(Name = "Date of Birth")]
             [DataType(DataType.Date)]
             public DateTime? DateOfBirth { get; set; }

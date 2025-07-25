@@ -1,22 +1,303 @@
+/* ========== Base Styles & Variables ========== */
+:root {
+    /* Color Palette */
+    --primary: #4e73df; /* Main brand blue */
+    --primary-dark: #2e59d9;
+    --primary-light: #e6f0ff;
+    --secondary: #1cc88a; /* Success green */
+    --accent: #f6c23e; /* Warning yellow */
+    --danger: #e74a3b; /* Danger red */
+    --light: #f8f9fc; /* Light background */
+    --dark: #5a5c69; /* Dark text */
+    --gray: #dddfeb;
+    --white: #ffffff;
+    /* Shadows */
+    --shadow-sm: 0 0.15rem 0.75rem rgba(58, 59, 69, 0.1);
+    --shadow-md: 0 0.15rem 1.75rem rgba(58, 59, 69, 0.15);
+    --shadow-lg: 0 0.5rem 2rem rgba(58, 59, 69, 0.2);
+    /* Spacing */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+    /* Border radius */
+    --radius-sm: 0.3rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+}
+
+/* ========== Typography ========== */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    color: var(--dark);
+    background-color: var(--light);
 }
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: var(--space-sm);
+}
+
+/* ========== Layout Components ========== */
+.container {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+    max-width: 1200px;
+}
+
+/* ========== Navigation ========== */
+.navbar {
+    box-shadow: var(--shadow-md);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--white) !important;
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--primary) !important;
+}
+
+.nav-link {
+    font-weight: 600;
+    padding: var(--space-xs) var(--space-sm) !important;
+    transition: all 0.2s ease;
+    color: var(--dark);
+}
+
+    .nav-link:hover {
+        color: var(--primary) !important;
+        transform: translateY(-2px);
+    }
+
+.nav-item.active .nav-link {
+    color: var(--primary) !important;
+    border-bottom: 2px solid var(--primary);
+}
+
+/* ========== Buttons ========== */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    padding: var(--space-xs) var(--space-md);
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+.btn-outline-primary {
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary);
+        color: var(--white);
+    }
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus {
+    box-shadow: 0 0 0 0.1rem var(--white), 0 0 0 0.25rem var(--primary-light);
+}
+
+/* ========== Cards ========== */
+.card {
+    border: none;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: var(--space-md);
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+.card-header {
+    background-color: var(--primary);
+    color: var(--white);
+    font-weight: 600;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+    padding: var(--space-sm);
+}
+
+.card-body {
+    padding: var(--space-lg);
+    background-color: var(--white);
+}
+
+/* ========== Forms ========== */
+.form-control {
+    border-radius: var(--radius-sm);
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--gray);
+    transition: border-color 0.2s;
+}
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem var(--primary-light);
+    }
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+    color: var(--dark);
+}
+
+/* ========== Tables ========== */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin-bottom: var(--space-md);
+}
+
+    .table thead th {
+        background-color: var(--light);
+        color: var(--dark);
+        font-weight: 700;
+        border-top: 1px solid var(--gray);
+        padding: var(--space-sm);
+    }
+
+    .table td, .table th {
+        padding: var(--space-sm);
+        vertical-align: middle;
+        border-top: 1px solid var(--gray);
+    }
+
+.table-hover tbody tr:hover {
+    background-color: rgba(78, 115, 223, 0.05);
+}
+
+/* ========== Animations ========== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* ========== Utility Classes ========== */
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow-md {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.rounded-sm {
+    border-radius: var(--radius-sm) !important;
+}
+
+.rounded-md {
+    border-radius: var(--radius-md) !important;
+}
+
+.rounded-lg {
+    border-radius: var(--radius-lg) !important;
+}
+
+/* ========== Responsive Adjustments ========== */
+@media (max-width: 768px) {
+    .navbar-collapse {
+        padding: var(--space-sm) 0;
+    }
+
+    .card-body {
+        padding: var(--space-md);
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: var(--space-xs);
+    }
+
+    .container {
+        padding-left: var(--space-sm);
+        padding-right: var(--space-sm);
+    }
+}
+
+/* ========== Footer ========== */
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+    background-color: var(--white);
+    box-shadow: 0 -0.15rem 0.75rem rgba(58, 59, 69, 0.1);
+}
+
+/* ========== Loading Spinner ========== */
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 0.35em solid rgba(78, 115, 223, 0.2);
+    border-left-color: var(--primary);
+    animation: spin 1s linear infinite;
+    border-radius: 50%;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.privacy-policy-content {
+    line-height: 1.8;
+}
+
+    .privacy-policy-content h2 {
+        color: #2c3e50;
+        padding-bottom: 0.3em;
+        border-bottom: 1px solid #eee;
+    }
+
+    .privacy-policy-content h3 {
+        color: #34495e;
+        margin-top: 1.5em;
+    }

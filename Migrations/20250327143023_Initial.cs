@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VeterinaryClinic.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,9 +32,8 @@ namespace VeterinaryClinic.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Age = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -182,7 +181,8 @@ namespace VeterinaryClinic.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Age = table.Column<int>(type: "int", nullable: false)
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    AnimalType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -196,23 +196,24 @@ namespace VeterinaryClinic.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PetVaccine",
+                name: "PetVaccines",
                 columns: table => new
                 {
                     PetId = table.Column<int>(type: "int", nullable: false),
-                    VaccineId = table.Column<int>(type: "int", nullable: false)
+                    VaccineId = table.Column<int>(type: "int", nullable: false),
+                    DateAdministered = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PetVaccine", x => new { x.PetId, x.VaccineId });
+                    table.PrimaryKey("PK_PetVaccines", x => new { x.PetId, x.VaccineId });
                     table.ForeignKey(
-                        name: "FK_PetVaccine_Pets_PetId",
+                        name: "FK_PetVaccines_Pets_PetId",
                         column: x => x.PetId,
                         principalTable: "Pets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PetVaccine_Vaccines_VaccineId",
+                        name: "FK_PetVaccines_Vaccines_VaccineId",
                         column: x => x.VaccineId,
                         principalTable: "Vaccines",
                         principalColumn: "Id",
@@ -264,8 +265,8 @@ namespace VeterinaryClinic.Migrations
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PetVaccine_VaccineId",
-                table: "PetVaccine",
+                name: "IX_PetVaccines_VaccineId",
+                table: "PetVaccines",
                 column: "VaccineId");
         }
 
@@ -288,7 +289,7 @@ namespace VeterinaryClinic.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "PetVaccine");
+                name: "PetVaccines");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

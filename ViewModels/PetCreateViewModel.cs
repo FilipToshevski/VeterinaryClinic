@@ -8,7 +8,7 @@ namespace VeterinaryClinic.ViewModels
     {
         [Required(ErrorMessage = "Please select an owner")]
         [Display(Name = "Owner")]
-        public string OwnerId { get; set; } = string.Empty;
+        public string OwnerId { get; set; } 
 
         [Required(ErrorMessage = "Please enter a pet name")]
         [StringLength(50, MinimumLength = 2)]

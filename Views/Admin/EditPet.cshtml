@@ -1,113 +1,294 @@
 ﻿@model VeterinaryClinic.ViewModels.PetEditViewModel
+@{
+    ViewData["Title"] = "Edit Pet";
+}
 
-<div class="edit-pet-container">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Pet</h4>
-        </div>
-        <div class="card-body">
-            <form asp-controller="Admin" asp-action="EditPet" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" asp-for="Id" />
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">@ViewData["Title"]</h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="EditPet" method="post" id="petEditForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
 
-                <div asp-validation-summary="All" class="alert alert-danger"></div>
+            <!-- Validation Summary -->
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 @(ViewData.ModelState.IsValid ? "d-none" : "")"></div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="Name" class="form-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+            <!-- Pet Name -->
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" data-val="true" />
+                <span asp-validation-for="Name" class="text-danger small" data-valmsg-for="Name"></span>
+            </div>
+
+            <!-- Age -->
+            <div class="form-group mb-3">
+                <label asp-for="Age" class="form-label"></label>
+                <input asp-for="Age" type="number" class="form-control" min="0" max="50" data-val="true" />
+                <span asp-validation-for="Age" class="text-danger small" data-valmsg-for="Age"></span>
+            </div>
+
+            <!-- Animal Type -->
+            <div class="form-group mb-4">
+                <label asp-for="AnimalType" class="form-label"></label>
+                <select asp-for="AnimalType" asp-items="Model.AnimalTypeOptions"
+                        class="form-control select2-animal" data-val="true">
+                    <option value="">-- Select Animal Type --</option>
+                </select>
+                <span asp-validation-for="AnimalType" class="text-danger small" data-valmsg-for="AnimalType"></span>
+            </div>
+
+            <!-- Current Vaccines -->
+            <div class="card mb-4" id="current-vaccines-section">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Current Vaccines</h5>
                 </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="Age" class="form-label"></label>
-                    <input asp-for="Age" type="number" class="form-control" min="0" max="50" />
-                    <span asp-validation-for="Age" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-4">
-                    <label asp-for="AnimalType" class="form-label"></label>
-                    <select asp-for="AnimalType" asp-items="Model.AnimalTypeOptions" class="form-select">
-                        <option value="">-- Select Animal Type --</option>
-                    </select>
-                    <span asp-validation-for="AnimalType" class="text-danger"></span>
-                </div>
-
-                
-                
-                <div class="card mt-4 shadow-sm">
-                    <div class="card-header bg-info text-white">
-                        <h5><i class="fas fa-syringe me-2"></i>Vaccine Management</h5>
-                    </div>
-                    <div class="card-body">
-                        <h6>Add Vaccine</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Select Existing Vaccine</label>
-                                <select asp-for="VaccineSelection.SelectedVaccineId" class="form-select">
-                                    <option value="">-- Select Vaccine --</option>
-                                    @foreach (var vaccine in Model.VaccineSelection.ExistingVaccines)
+                <div class="card-body">
+                    @if (ViewBag.CurrentVaccines != null && ((List<PetVaccine>)ViewBag.CurrentVaccines).Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Vaccine</th>
+                                        <th>Date Administered</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var vaccine in (List<PetVaccine>)ViewBag.CurrentVaccines)
                                     {
-                                        <option value="@vaccine.Value">@vaccine.Text</option>
+                                        <tr>
+                                            <td>@vaccine.Vaccine?.Name</td>
+                                            <td>@vaccine.DateAdministered.ToShortDateString()</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        onclick="removeVaccine(@Model.Id, @vaccine.VaccineId)">
+                                                    <i class="fas fa-trash-alt"></i> Remove
+                                                </button>
+                                            </td>
+                                        </tr>
                                     }
-                                </select>
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">No vaccines assigned yet.</div>
+                    }
+                </div>
+            </div>
 
-                        <!-- Current Vaccines List -->
-                        <h6 class="mt-4">Current Vaccines</h6>
-                        @if (Model.CurrentVaccines.Any())
-                        {
-                            <ul class="list-group">
-                                @foreach (var vaccine in Model.CurrentVaccines)
-                                {
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        @vaccine.Name
-                                        <small class="text-muted">@vaccine.DateAdministered.ToShortDateString()</small>
-                                        <form asp-action="RemoveVaccine" method="post"
-                                              asp-route-petId="@Model.Id" asp-route-vaccineId="@vaccine.Id">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </form>
-                                    </li>
+            <!-- Available Vaccines -->
+            <div class="card mb-4" id="available-vaccines-section">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Available Vaccines</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.AvailableVaccines != null && ((List<Vaccine>)ViewBag.AvailableVaccines).Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <tbody>
+                                    @foreach (var vaccine in (List<Vaccine>)ViewBag.AvailableVaccines)
+                                    {
+                                        <tr>
+                                            <td>@vaccine.Name</td>
+                                            <td class="text-end">
+                                                <button type="button" class="btn btn-sm btn-outline-success"
+                                                        onclick="addVaccine(@Model.Id, @vaccine.Id)">
+                                                    <i class="fas fa-plus"></i> Add
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">No vaccines available to add.</div>
+                    }
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a asp-action="ManagePets" class="btn btn-outline-secondary me-md-2">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <button type="submit" class="btn btn-primary" id="saveButton">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+        // Replace the JavaScript section in your EditPet view with this:
+
+    <script>
+        $(document).ready(function() {
+            // Initialize select2 for animal type dropdown
+            $('.select2-animal').select2({
+                placeholder: "Select animal type",
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Main form submission handler
+            $('#petEditForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const form = $(this);
+                const submitBtn = $('#saveButton');
+                const originalBtnText = submitBtn.html();
+
+                submitBtn.prop('disabled', true)
+                       .html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+
+                // Submit form via AJAX
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            window.location.href = response.redirectUrl || '@Url.Action("ManagePets")';
+                        } else {
+                            // Handle validation errors
+                            if (response.errors) {
+                                // Clear previous errors
+                                $('.text-danger').empty();
+                                $('.is-invalid').removeClass('is-invalid');
+
+                                // Display new errors
+                                for (const [key, value] of Object.entries(response.errors)) {
+                                    const element = $(`[data-valmsg-for="${key}"]`);
+                                    element.html(value.join(', '));
+                                    $(`#${key}`).addClass('is-invalid');
                                 }
-                            </ul>
+                            }
                         }
-                        else
-                        {
-                            <div class="alert alert-warning">No vaccines recorded for this pet.</div>
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 400) {
+                            // Handle bad request (likely validation errors)
+                            const response = xhr.responseJSON;
+                            alert(response?.message || 'Please check your input and try again');
+                        } else {
+                            alert('An unexpected error occurred: ' + xhr.statusText);
                         }
-                    </div>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <a asp-controller="Admin" asp-action="ManagePets" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to List
-                    </a>
-                    <button type="submit" class="btn btn-primary" id="saveButton">
-                        <i class="fas fa-save me-2"></i>Save Changes
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        @section Scripts {
-            @{
-                await Html.RenderPartialAsync("_ValidationScriptsPartial");
-            }
-            <script>
-                $(document).ready(function() {
-                    // Clear selections when switching between options
-                    $('input[name="VaccineSelection.NewVaccineName"]').on('input', function() {
-                        if ($(this).val().trim() !== '') {
-                            $('select[name="VaccineSelection.SelectedVaccineId"]').val('');
-                        }
-                    });
-
-                    $('select[name="VaccineSelection.SelectedVaccineId"]').change(function() {
-                        if ($(this).val() !== '') {
-                            $('input[name="VaccineSelection.NewVaccineName"]').val('');
-                        }
-                    });
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                    }
                 });
-            </script>
+            });
+        });
+
+        function addVaccine(petId, vaccineId) {
+            $.post({
+                url: '@Url.Action("AddVaccineToPet", "Admin")',
+                data: {
+                    petId: petId,
+                    vaccineId: vaccineId,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Show success message
+                        showAlert(response.message, 'success');
+                        // Refresh vaccine sections
+                        refreshVaccineSections(petId);
+                    } else {
+                        showAlert(response.message || 'Error adding vaccine', 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error adding vaccine:', xhr);
+                    const response = xhr.responseJSON;
+                    showAlert(response?.message || 'Error adding vaccine', 'danger');
+                }
+            });
+        }
+
+        function removeVaccine(petId, vaccineId) {
+            if (!confirm('Are you sure you want to remove this vaccine?')) return;
+
+            $.post({
+                url: '@Url.Action("RemoveVaccineFromPet", "Admin")',
+                data: {
+                    petId: petId,
+                    vaccineId: vaccineId,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Show success message
+                        showAlert(response.message, 'success');
+                        // Refresh vaccine sections
+                        refreshVaccineSections(petId);
+                    } else {
+                        showAlert(response.message || 'Error removing vaccine', 'danger');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error removing vaccine:', xhr);
+                    const response = xhr.responseJSON;
+                    showAlert(response?.message || 'Error removing vaccine', 'danger');
+                }
+            });
+        }
+
+        function refreshVaccineSections(petId) {
+            $.get('@Url.Action("RefreshVaccineSections", "Admin")', { id: petId })
+                .done(function(response) {
+                    if (response.success) {
+                        $('#current-vaccines-section').html(response.currentVaccines);
+                        $('#available-vaccines-section').html(response.availableVaccines);
+                    } else {
+                        showAlert(response.message || 'Error refreshing sections', 'warning');
+                    }
+                })
+                .fail(function(xhr) {
+                    console.error('Error refreshing vaccine sections:', xhr);
+                    showAlert('Error refreshing vaccine sections', 'warning');
+                });
+        }
+
+        function showAlert(message, type) {
+            // Create alert element
+            const alertClass = `alert-${type}`;
+            const iconClass = type === 'success' ? 'fa-check-circle' :
+                             type === 'danger' ? 'fa-exclamation-circle' :
+                             'fa-info-circle';
+
+            const alertHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas ${iconClass} me-2"></i>${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+
+            // Add alert to the top of the card body
+            $('.card-body').first().prepend(alertHTML);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut(function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
+    </script>
 }

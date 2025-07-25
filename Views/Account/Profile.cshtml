@@ -1,5 +1,231 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model VeterinaryClinic.ViewModels.ProfileViewModel
 @{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <!-- Profile Header -->
+        <div class="card-header bg-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-user-circle me-2"></i>@ViewData["Title"]
+                </h2>
+
+            </div>
+        </div>
+
+        <!-- Admin Controls -->
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="card-body border-bottom">
+                <div class="d-flex flex-wrap gap-2">
+                    <a asp-controller="Admin" asp-action="ManageVaccines" class="btn btn-primary">
+                        <i class="fas fa-syringe me-2"></i>Vaccines
+                    </a>
+                    <a asp-controller="Admin" asp-action="ManagePets" class="btn btn-success">
+                        <i class="fas fa-paw me-2"></i>Pets
+                    </a>
+                    <a asp-controller="Admin" asp-action="ManageOwners" class="btn btn-info text-white">
+                        <i class="fas fa-users me-2"></i>Owners
+                    </a>
+                </div>
+            </div>
+        }
+
+        <div class="card-body">
+            <div class="row">
+                <!-- Personal Information Column -->
+                <div class="col-lg-6 pe-lg-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h4 class="mb-0"><i class="fas fa-id-card me-2"></i>Personal Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="FirstName" class="form-control" placeholder=" " />
+                                            <label asp-for="FirstName"></label>
+                                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="LastName" class="form-control" placeholder=" " />
+                                            <label asp-for="LastName"></label>
+                                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input asp-for="Email" class="form-control" placeholder=" " readonly />
+                                            <label asp-for="Email"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="PhoneNumber" class="form-control" placeholder=" " />
+                                            <label asp-for="PhoneNumber"></label>
+                                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="DateOfBirth" type="date" class="form-control" placeholder=" " />
+                                            <label asp-for="DateOfBirth"></label>
+                                            <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    @if (Model.CalculatedAge.HasValue)
+                                    {
+                                        <div class="col-12">
+                                            <div class="form-floating">
+                                                <input value="@Model.CalculatedAge" class="form-control" placeholder=" " readonly />
+                                                <label>Age</label>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="col-12 mt-3">
+                                        <button type="submit" class="btn btn-primary w-100 py-2">
+                                            <i class="fas fa-save me-2"></i>Update Profile
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pets Column -->
+                <!-- Pets Column -->
+                <div class="col-lg-6 ps-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0"><i class="fas fa-paw me-2"></i>Your Pets</h4>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-controller="Admin" asp-action="CreatePet" class="btn btn-sm btn-success">
+                                        <i class="fas fa-plus me-1"></i>Add Pet
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.Pets.Any())
+                            {
+                                <div class="list-group">
+                                    @foreach (var pet in Model.Pets)
+                                    {
+                                        <div class="list-group-item mb-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-1">
+                                                    <i class="fas @GetPetIcon(pet.AnimalType) me-2"></i>
+                                                    @pet.Name (@pet.AnimalType, @pet.Age years)
+                                                </h5>
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    <a asp-controller="Admin" asp-action="EditPet" asp-route-id="@pet.PetId"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                }
+                                            </div>
+
+                                            @if (pet.Vaccines.Any())
+                                            {
+                                                <div class="mt-2">
+                                                    <h6 class="text-muted">Vaccines:</h6>
+                                                    <ul class="list-unstyled">
+                                                        @foreach (var vaccine in pet.Vaccines)
+                                                        {
+                                                            <li class="ms-3">
+                                                                <i class="fas fa-syringe text-success me-2"></i>
+                                                                @vaccine.Name (given on @vaccine.DateAdministered.ToString("d"))
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="alert alert-info mt-2 mb-0">
+                                                    No vaccines recorded for @pet.Name
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-4">
+                                    <i class="fas fa-paw fa-4x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No Pets Registered</h5>
+                                    <p class="text-muted">You haven't added any pets yet</p>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-controller="Admin" asp-action="CreatePet" class="btn btn-success mt-2">
+                                            <i class="fas fa-plus me-1"></i>Add Your First Pet
+                                        </a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @functions {
+                    string GetPetIcon(string animalType)
+                    {
+                        return animalType.ToLower() switch
+                        {
+                            "dog" => "fa-dog",
+                            "cat" => "fa-cat",
+                            "bird" => "fa-dove",
+                            "rabbit" => "fa-rabbit",
+                            "hamster" => "fa-hamster",
+                            "fish" => "fa-fish",
+                            "reptile" => "fa-dragon",
+                            _ => "fa-paw"
+                        };
+                    }
+                }
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .form-floating > label {
+            padding: 1rem 1.25rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .badge {
+            font-size: 0.85em;
+            padding: 0.5em 0.75em;
+            border-radius: 1em;
+        }
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

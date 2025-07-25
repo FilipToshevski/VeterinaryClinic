@@ -1,8 +1,204 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome to Our Veterinary Clinic";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="hero-title">Compassionate Care for Your Beloved Pets</h1>
+                <p class="hero-subtitle">Your trusted partner in pet health and wellness. We provide exceptional veterinary services with a personal touch.</p>
+                <div class="hero-buttons">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Account" asp-action="Profile" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-user me-2"></i>My Profile
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-paw me-2"></i>Register
+                        </a>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1582456891955-9a8cb5e05039" alt="Happy dog at vet clinic" class="img-fluid rounded hero-image">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Our Services</h2>
+            <p class="section-subtitle">Comprehensive care for all your pet's needs</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="service-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-syringe text-primary fa-3x"></i>
+                        </div>
+                        <h3 class="h5">Vaccinations</h3>
+                        <p>Complete vaccination programs to protect your pets from diseases.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-stethoscope text-primary fa-3x"></i>
+                        </div>
+                        <h3 class="h5">Health Checks</h3>
+                        <p>Regular examinations to ensure your pet's ongoing health and wellbeing.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-cut text-primary fa-3x"></i>
+                        </div>
+                        <h3 class="h5">Grooming</h3>
+                        <p>Professional grooming services to keep your pet looking and feeling great.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">What Pet Owners Say</h2>
+            <p class="section-subtitle">Trusted by hundreds of happy pet owners</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="testimonial-card card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left text-muted fa-2x"></i>
+                        </div>
+                        <p class="mb-4">"The care my dog received was exceptional. The vets are knowledgeable and truly care about animals."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="Sarah J." class="rounded-circle me-3" width="50">
+                            <div>
+                                <h6 class="mb-0">Sarah J.</h6>
+                                <small class="text-muted">Dog Owner</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left text-muted fa-2x"></i>
+                        </div>
+                        <p class="mb-4">"Friendly staff and clean facilities. My cat actually seems to enjoy her visits!"</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael T." class="rounded-circle me-3" width="50">
+                            <div>
+                                <h6 class="mb-0">Michael T.</h6>
+                                <small class="text-muted">Cat Owner</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left text-muted fa-2x"></i>
+                        </div>
+                        <p class="mb-4">"Emergency service saved my rabbit's life. Forever grateful to this clinic."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Emma R." class="rounded-circle me-3" width="50">
+                            <div>
+                                <h6 class="mb-0">Emma R.</h6>
+                                <small class="text-muted">Rabbit Owner</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Schedule an Appointment?</h2>
+        <p class="mb-4">Our team is ready to provide the best care for your pet.</p>
+        <a asp-controller="Account" asp-action="Login" class="btn btn-light btn-lg px-4">
+            <i class="fas fa-calendar-check me-2"></i>Book Now
+        </a>
+    </div>
+</section>
+
+<!-- Add this CSS to your site.css -->
+<style>
+    /* ========== Responsive Adjustments ========== */
+     {
+        .hero-section
+
+    {
+        padding: 3rem 0;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-buttons .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+        .hero-buttons .btn:last-child {
+            margin-bottom: 0;
+        }
+
+    .hero-image {
+        margin-top: 2rem;
+    }
+
+    .navbar-collapse {
+        padding: var(--space-sm) 0;
+    }
+
+    .card-body {
+        padding: var(--space-md);
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: var(--space-xs);
+    }
+
+    .container {
+        padding-left: var(--space-sm);
+        padding-right: var(--space-sm);
+    }
+
+    }
+</style>

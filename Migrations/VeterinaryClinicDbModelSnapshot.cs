@@ -159,21 +159,6 @@ namespace VeterinaryClinic.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PetsVaccine", b =>
-                {
-                    b.Property<int>("PetsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VaccineId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PetsId", "VaccineId");
-
-                    b.HasIndex("VaccineId");
-
-                    b.ToTable("PetsVaccine");
-                });
-
             modelBuilder.Entity("VeterinaryClinic.Models.Owner", b =>
                 {
                     b.Property<string>("Id")
@@ -189,7 +174,7 @@ namespace VeterinaryClinic.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -253,6 +238,24 @@ namespace VeterinaryClinic.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("VeterinaryClinic.Models.PetVaccine", b =>
+                {
+                    b.Property<int>("PetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VaccineId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateAdministered")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PetId", "VaccineId");
+
+                    b.HasIndex("VaccineId");
+
+                    b.ToTable("PetVaccines");
+                });
+
             modelBuilder.Entity("VeterinaryClinic.Models.Pets", b =>
                 {
                     b.Property<int>("Id")
@@ -263,6 +266,11 @@ namespace VeterinaryClinic.Migrations
 
                     b.Property<int>("Age")
                         .HasColumnType("int");
+
+                    b.Property<string>("AnimalType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -347,19 +355,23 @@ namespace VeterinaryClinic.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PetsVaccine", b =>
+            modelBuilder.Entity("VeterinaryClinic.Models.PetVaccine", b =>
                 {
-                    b.HasOne("VeterinaryClinic.Models.Pets", null)
-                        .WithMany()
-                        .HasForeignKey("PetsId")
+                    b.HasOne("VeterinaryClinic.Models.Pets", "Pet")
+                        .WithMany("PetVaccines")
+                        .HasForeignKey("PetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VeterinaryClinic.Models.Vaccine", null)
-                        .WithMany()
+                    b.HasOne("VeterinaryClinic.Models.Vaccine", "Vaccine")
+                        .WithMany("PetVaccines")
                         .HasForeignKey("VaccineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Pet");
+
+                    b.Navigation("Vaccine");
                 });
 
             modelBuilder.Entity("VeterinaryClinic.Models.Pets", b =>
@@ -376,6 +388,16 @@ namespace VeterinaryClinic.Migrations
             modelBuilder.Entity("VeterinaryClinic.Models.Owner", b =>
                 {
                     b.Navigation("Pets");
+                });
+
+            modelBuilder.Entity("VeterinaryClinic.Models.Pets", b =>
+                {
+                    b.Navigation("PetVaccines");
+                });
+
+            modelBuilder.Entity("VeterinaryClinic.Models.Vaccine", b =>
+                {
+                    b.Navigation("PetVaccines");
                 });
 #pragma warning restore 612, 618
         }

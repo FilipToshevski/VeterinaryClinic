@@ -1,0 +1,39 @@
+﻿@model List<PetVaccine>
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Vaccine</th>
+                <th>Date Administered</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                @foreach (var vaccine in Model)
+                {
+                    <tr>
+                        <td>@vaccine.Vaccine?.Name</td>
+                        <td>@vaccine.DateAdministered.ToShortDateString()</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="removeVaccine(@vaccine.PetId, @vaccine.VaccineId)">
+                                <i class="fas fa-trash-alt"></i> Remove
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <div class="alert alert-info mb-0">No vaccines assigned yet.</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

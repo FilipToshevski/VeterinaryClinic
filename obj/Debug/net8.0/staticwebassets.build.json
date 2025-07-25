@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "48NeIuKeXWYNZ8BKcnlKTQ5xAA4qZaZLUhDJFQsMvSc=",
+  "Hash": "j2MXDhGB2LS4eQ0hCpdMF6PZg3ZjAxfjYssSQyU82Wg=",
   "Source": "VeterinaryClinic",
   "BasePath": "_content/VeterinaryClinic",
   "Mode": "Default",
@@ -1333,8 +1333,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "c2tiyv64ts",
-      "Integrity": "pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=",
+      "Fingerprint": "ikh85l65dx",
+      "Integrity": "8kP4nLdP9pUBo7maEWVtDm0HWlqYhEuefp2ipweqYlw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -2581,51 +2581,6 @@
   ],
   "Endpoints": [
     {
-      "Route": "css/site.c2tiyv64ts.css",
-      "AssetFile": "C:\\Users\\lefnu\\OneDrive\\Desktop\\Proekt\\VeterinaryClinic\\VeterinaryClinic\\wwwroot\\css\\site.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "362"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sat, 22 Mar 2025 23:42:57 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "c2tiyv64ts"
-        },
-        {
-          "Name": "label",
-          "Value": "css/site.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
-        }
-      ]
-    },
-    {
       "Route": "css/site.css",
       "AssetFile": "C:\\Users\\lefnu\\OneDrive\\Desktop\\Proekt\\VeterinaryClinic\\VeterinaryClinic\\wwwroot\\css\\site.css",
       "Selectors": [],
@@ -2636,7 +2591,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "362"
+          "Value": "6781"
         },
         {
           "Name": "Content-Type",
@@ -2644,11 +2599,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
+          "Value": "\"8kP4nLdP9pUBo7maEWVtDm0HWlqYhEuefp2ipweqYlw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 22 Mar 2025 23:42:57 GMT"
+          "Value": "Fri, 28 Mar 2025 14:51:56 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2658,7 +2613,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
+          "Value": "sha256-8kP4nLdP9pUBo7maEWVtDm0HWlqYhEuefp2ipweqYlw="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.ikh85l65dx.css",
+      "AssetFile": "C:\\Users\\lefnu\\OneDrive\\Desktop\\Proekt\\VeterinaryClinic\\VeterinaryClinic\\wwwroot\\css\\site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "6781"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"8kP4nLdP9pUBo7maEWVtDm0HWlqYhEuefp2ipweqYlw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 28 Mar 2025 14:51:56 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ikh85l65dx"
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-8kP4nLdP9pUBo7maEWVtDm0HWlqYhEuefp2ipweqYlw="
         }
       ]
     },
@@ -9743,7 +9743,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Thu, 27 Mar 2025 01:58:35 GMT"
+          "Value": "Fri, 28 Mar 2025 13:36:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -9788,7 +9788,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Thu, 27 Mar 2025 01:58:35 GMT"
+          "Value": "Fri, 28 Mar 2025 13:36:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -9833,7 +9833,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Thu, 27 Mar 2025 01:58:35 GMT"
+          "Value": "Fri, 28 Mar 2025 13:36:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -9870,7 +9870,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Thu, 27 Mar 2025 01:58:35 GMT"
+          "Value": "Fri, 28 Mar 2025 13:36:51 GMT"
         },
         {
           "Name": "Cache-Control",

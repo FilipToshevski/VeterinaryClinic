@@ -2,8 +2,9 @@
 {
     public class Vaccine
     {
-        
+        public int Id { get; set; }
         public string Name { get; set; }
-        public List<Pets> Pets { get; set; } = new List<Pets>();
+        
+        public ICollection<PetVaccine> PetVaccines { get; set; } = new List<PetVaccine>();
     }
 }

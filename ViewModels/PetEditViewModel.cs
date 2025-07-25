@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VeterinaryClinic.ViewModels
 {
+
     public class PetEditViewModel
     {
         public int Id { get; set; }
@@ -17,20 +18,14 @@ namespace VeterinaryClinic.ViewModels
         public int Age { get; set; }
 
         [Required(ErrorMessage = "Please specify animal type")]
+        [Display(Name = "Animal Type")]
         public string AnimalType { get; set; }
-        
+
         [ValidateNever]
         public SelectList AnimalTypeOptions { get; set; }
 
-        public List<VaccineViewModel> CurrentVaccines { get; set; } = new List<VaccineViewModel>();
-        public VaccineSelectViewModel VaccineSelection { get; set; } 
-    }
-
-
-    public class VaccineViewModel
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public DateTime DateAdministered { get; set; }
+        // Add these to properly handle vaccine forms
+        public int? VaccineToAdd { get; set; }
+        public int? VaccineToRemove { get; set; }
     }
 }

@@ -1,0 +1,31 @@
+﻿@model List<Vaccine>
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover">
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                @foreach (var vaccine in Model)
+                {
+                    <tr>
+                        <td>@vaccine.Name</td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-outline-success"
+                                    onclick="addVaccine(@ViewBag.PetId, @vaccine.Id)">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-center">
+                        <div class="alert alert-info mb-0">No vaccines available to add.</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

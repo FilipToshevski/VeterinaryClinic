@@ -7,6 +7,9 @@ using VeterinaryClinic.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VeterinaryClinic.Controllers;
+using static VeterinaryClinic.ViewModels.ProfileViewModel;
+using System.Linq;
+using YourProjectNamespace.Extensions;
 
 namespace VeterinaryClinic.Controllers
 {
@@ -78,7 +81,6 @@ namespace VeterinaryClinic.Controllers
             return View(viewModel);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> EditPet(int id)
         {
@@ -89,8 +91,12 @@ namespace VeterinaryClinic.Controllers
 
             if (pet == null) return NotFound();
 
-            // Get ALL vaccines (not just unused ones) for the dropdown
+            // Get all vaccines
             var allVaccines = await _context.Vaccines.ToListAsync();
+            var petVaccineIds = pet.PetVaccines.Select(pv => pv.VaccineId).ToList();
+            var availableVaccines = allVaccines
+                .Where(v => !petVaccineIds.Contains(v.Id))
+                .ToList();
 
             var viewModel = new PetEditViewModel
             {
@@ -98,30 +104,11 @@ namespace VeterinaryClinic.Controllers
                 Name = pet.Name,
                 Age = pet.Age,
                 AnimalType = pet.AnimalType,
-                AnimalTypeOptions = new SelectList(new List<string>
-        {
-            "Dog", "Cat", "Bird", "Rabbit",
-            "Hamster", "Fish", "Reptile", "Other"
-        }),
-                CurrentVaccines = pet.PetVaccines.Select(pv => new VaccineViewModel
-                {
-                    Id = pv.Vaccine.Id,
-                    Name = pv.Vaccine.Name,
-                    DateAdministered = pv.DateAdministered
-                }).ToList(),
-                VaccineSelection = new VaccineSelectViewModel
-                {
-                    PetId = pet.Id,
-                    PetName = pet.Name,
-                    ExistingVaccines = allVaccines
-                        .Where(v => !pet.PetVaccines.Any(pv => pv.VaccineId == v.Id))
-                        .Select(v => new SelectListItem
-                        {
-                            Value = v.Id.ToString(),
-                            Text = v.Name
-                        }).ToList()
-                }
+                AnimalTypeOptions = new SelectList(_animalTypes)
             };
+
+            ViewBag.CurrentVaccines = pet.PetVaccines.ToList();
+            ViewBag.AvailableVaccines = availableVaccines;
 
             return View(viewModel);
         }
@@ -130,63 +117,76 @@ namespace VeterinaryClinic.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPet(PetEditViewModel model)
         {
-            ModelState.Remove("VaccineSelection.PetName");
-
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var pet = await _context.Pets
-                        .Include(p => p.PetVaccines)
-                        .FirstOrDefaultAsync(p => p.Id == model.Id);
+                    var pet = await _context.Pets.FindAsync(model.Id);
+                    if (pet == null)
+                    {
+                        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                        {
+                            return Json(new { success = false, message = "Pet not found" });
+                        }
+                        TempData["ErrorMessage"] = "Pet not found!";
+                        return RedirectToAction("ManagePets");
+                    }
 
-                    if (pet == null) return NotFound();
-
-                    // Update pet details
+                    // Update pet info
                     pet.Name = model.Name;
                     pet.Age = model.Age;
                     pet.AnimalType = model.AnimalType;
 
-                    // Handle vaccine additions from dropdown (existing vaccines only)
-                    if (model.VaccineSelection.SelectedVaccineId.HasValue)
-                    {
-                        var vaccineId = model.VaccineSelection.SelectedVaccineId.Value;
-                        var existingAssociation = await _context.PetVaccines
-                            .AnyAsync(pv => pv.PetId == pet.Id && pv.VaccineId == vaccineId);
+                    _context.Pets.Update(pet);
+                    await _context.SaveChangesAsync();
 
-                        if (!existingAssociation)
-                        {
-                            _context.PetVaccines.Add(new PetVaccine
-                            {
-                                PetId = pet.Id,
-                                VaccineId = vaccineId,
-                                DateAdministered = DateTime.UtcNow
-                            });
-                        }
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = true, redirectUrl = Url.Action("ManagePets") });
                     }
 
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Pet updated successfully!";
+                    TempData["SuccessMessage"] = $"Pet '{pet.Name}' updated successfully!";
                     return RedirectToAction("ManagePets");
                 }
                 catch (Exception ex)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Error updating pet",
+                            errors = ModelState.ToDictionary(
+                                k => k.Key,
+                                v => v.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                            )
+                        });
+                    }
+
                     ModelState.AddModelError("", $"Error updating pet: {ex.Message}");
+                    TempData["ErrorMessage"] = "An error occurred while updating the pet.";
                 }
             }
 
-            // Repopulate dropdowns if returning to view
-            var allVaccines = await _context.Vaccines.ToListAsync();
-            model.VaccineSelection.ExistingVaccines = allVaccines
-                .Where(v => !model.CurrentVaccines.Any(cv => cv.Id == v.Id))
-                .Select(v => new SelectListItem
+            // If we got here, something went wrong
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Json(new
                 {
-                    Value = v.Id.ToString(),
-                    Text = v.Name
-                }).ToList();
+                    success = false,
+                    message = "Validation failed",
+                    errors = ModelState.ToDictionary(
+                        k => k.Key,
+                        v => v.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    )
+                });
+            }
 
+            // Repopulate dropdowns for non-AJAX requests
+            model.AnimalTypeOptions = new SelectList(_animalTypes, model.AnimalType);
             return View(model);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -209,28 +209,12 @@ namespace VeterinaryClinic.Controllers
         [HttpGet]
         public async Task<IActionResult> CreatePet()
         {
-            var owners = await _context.Users
-                .Where(o => o.FirstName != null && o.LastName != null)
-                .OrderBy(o => o.LastName)
-                .ThenBy(o => o.FirstName)
-                .ToListAsync();
-
-            var vaccines = await _context.Vaccines.OrderBy(v => v.Name).ToListAsync();
-
             var viewModel = new PetCreateViewModel
             {
-                OwnerOptions = new SelectList(
-                    owners.Select(o => new {
-                        o.Id,
-                        DisplayName = $"{o.LastName}, {o.FirstName} ({o.Email})"
-                    }),
-                    "Id",
-                    "DisplayName"
-                ),
-                AnimalTypeOptions = new SelectList(_animalTypes),
-                VaccineOptions = new MultiSelectList(vaccines, "Id", "Name")
+                AnimalTypeOptions = new SelectList(_animalTypes)
             };
 
+            await RepopulateDropdowns(viewModel);
             return View(viewModel);
         }
 
@@ -242,8 +226,7 @@ namespace VeterinaryClinic.Controllers
             {
                 try
                 {
-                    // Create the pet first
-                    var pet = new Pet
+                    var pet = new Pets
                     {
                         OwnerId = model.OwnerId,
                         Name = model.Name,
@@ -252,62 +235,54 @@ namespace VeterinaryClinic.Controllers
                     };
 
                     _context.Pets.Add(pet);
-                    await _context.SaveChangesAsync(); // Save to get the pet ID
+                    await _context.SaveChangesAsync();
 
-                    // Handle vaccine associations
+                    // Add selected vaccines
                     if (model.SelectedVaccineIds != null && model.SelectedVaccineIds.Any())
                     {
                         foreach (var vaccineId in model.SelectedVaccineIds)
                         {
-                            // Check if vaccine exists
-                            var vaccineExists = await _context.Vaccines.AnyAsync(v => v.Id == vaccineId);
-                            if (vaccineExists)
+                            _context.PetVaccines.Add(new PetVaccine
                             {
-                                _context.PetVaccines.Add(new PetVaccine
-                                {
-                                    PetId = pet.Id,
-                                    VaccineId = vaccineId,
-                                    DateAdministered = DateTime.UtcNow
-                                });
-                            }
+                                PetId = pet.Id,
+                                VaccineId = vaccineId,
+                                DateAdministered = DateTime.UtcNow
+                            });
                         }
                         await _context.SaveChangesAsync();
                     }
 
                     TempData["SuccessMessage"] = "Pet created successfully!";
-                    return RedirectToAction("Profile", "Account");
+                    return RedirectToAction("ManagePets");
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", $"Error saving pet: {ex.Message}");
+                    ModelState.AddModelError("", $"Error creating pet: {ex.Message}");
+                    TempData["ErrorMessage"] = "An error occurred while creating the pet.";
                 }
             }
 
-            // Repopulate dropdowns if validation fails
+            // If we got here, something went wrong - repopulate dropdowns
             await RepopulateDropdowns(model);
             return View(model);
         }
 
         private async Task RepopulateDropdowns(PetCreateViewModel model)
         {
-            var owners = await _context.Users
-                .Where(o => o.FirstName != null && o.LastName != null)
+            var owners = await _userManager.Users
                 .OrderBy(o => o.LastName)
                 .ThenBy(o => o.FirstName)
-                .ToListAsync();
-
-            var vaccines = await _context.Vaccines.OrderBy(v => v.Name).ToListAsync();
-
-            model.OwnerOptions = new SelectList(
-                owners.Select(o => new {
+                .Select(o => new {
                     o.Id,
                     DisplayName = $"{o.LastName}, {o.FirstName} ({o.Email})"
-                }),
-                "Id",
-                "DisplayName",
-                model.OwnerId
-            );
+                })
+                .ToListAsync();
 
+            var vaccines = await _context.Vaccines
+                .OrderBy(v => v.Name)
+                .ToListAsync();
+
+            model.OwnerOptions = new SelectList(owners, "Id", "DisplayName", model.OwnerId);
             model.AnimalTypeOptions = new SelectList(_animalTypes, model.AnimalType);
             model.VaccineOptions = new MultiSelectList(vaccines, "Id", "Name", model.SelectedVaccineIds);
         }
@@ -320,46 +295,292 @@ namespace VeterinaryClinic.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddVaccine(string vaccineName)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateVaccine(string vaccineName)
         {
-            if (!string.IsNullOrWhiteSpace(vaccineName))
+            try
             {
+                if (string.IsNullOrWhiteSpace(vaccineName) || vaccineName.Length < 2 || vaccineName.Length > 50)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Vaccine name must be between 2-50 characters"
+                    });
+                }
+
+                // Check if vaccine already exists
+                var existingVaccine = await _context.Vaccines
+                    .FirstOrDefaultAsync(v => v.Name.ToLower() == vaccineName.Trim().ToLower());
+
+                if (existingVaccine != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "A vaccine with this name already exists"
+                    });
+                }
+
                 var vaccine = new Vaccine { Name = vaccineName.Trim() };
                 _context.Vaccines.Add(vaccine);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Vaccine added successfully!";
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Vaccine '{vaccine.Name}' added successfully!"
+                });
             }
-            return RedirectToAction("ManageVaccines");
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Error adding vaccine to database",
+                    error = ex.Message
+                });
+            }
         }
 
+        // This method is for the quick add from EditPet page (existing functionality)
         [HttpPost]
-        public async Task<IActionResult> DeleteVaccine(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddVaccineToPet(int petId, int vaccineId)
         {
-            var vaccine = await _context.Vaccines.FindAsync(id);
-            if (vaccine != null)
+            try
             {
-                _context.Vaccines.Remove(vaccine);
+                // Check if pet exists
+                var pet = await _context.Pets.FindAsync(petId);
+                if (pet == null)
+                {
+                    return Json(new { success = false, message = "Pet not found" });
+                }
+
+                // Check if vaccine exists
+                var vaccine = await _context.Vaccines.FindAsync(vaccineId);
+                if (vaccine == null)
+                {
+                    return Json(new { success = false, message = "Vaccine not found" });
+                }
+
+                // Check if vaccine is already assigned to this pet
+                var existing = await _context.PetVaccines
+                    .AnyAsync(pv => pv.PetId == petId && pv.VaccineId == vaccineId);
+
+                if (existing)
+                {
+                    return Json(new { success = false, message = "Vaccine already assigned to this pet" });
+                }
+
+                // Add the vaccine to the pet
+                var petVaccine = new PetVaccine
+                {
+                    PetId = petId,
+                    VaccineId = vaccineId,
+                    DateAdministered = DateTime.UtcNow
+                };
+
+                _context.PetVaccines.Add(petVaccine);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Vaccine deleted successfully!";
+
+                return Json(new { success = true, message = "Vaccine added successfully!" });
             }
-            return RedirectToAction("ManageVaccines");
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error adding vaccine", error = ex.Message });
+            }
+        }
+
+        // This method is for the detailed form (with date selection)
+        [HttpGet]
+        public async Task<IActionResult> AddVaccineForm(int petId)
+        {
+            var pet = await _context.Pets.FindAsync(petId);
+            if (pet == null) return NotFound();
+
+            var availableVaccines = await _context.Vaccines
+                .Where(v => !_context.PetVaccines
+                    .Any(pv => pv.PetId == petId && pv.VaccineId == v.Id))
+                .ToListAsync();
+
+            var model = new AddVaccineViewModel
+            {
+                PetId = pet.Id,
+                PetName = pet.Name,
+                AvailableVaccines = new SelectList(availableVaccines, "Id", "Name"),
+                DateAdministered = DateTime.UtcNow
+            };
+
+            return View("AddVaccine", model); // Specify the view name explicitly
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveVaccine(int petId, int vaccineId)
+        public async Task<IActionResult> AddVaccineForm(AddVaccineViewModel model)
         {
-            var petVaccine = await _context.PetVaccines
-                .FirstOrDefaultAsync(pv => pv.PetId == petId && pv.VaccineId == vaccineId);
-
-            if (petVaccine != null)
+            if (!ModelState.IsValid)
             {
-                _context.PetVaccines.Remove(petVaccine);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Vaccine removed successfully!";
+                // Repopulate vaccines dropdown if returning to view
+                var availableVaccines = await _context.Vaccines
+                    .Where(v => !_context.PetVaccines
+                        .Any(pv => pv.PetId == model.PetId && pv.VaccineId == v.Id))
+                    .ToListAsync();
+
+                model.AvailableVaccines = new SelectList(availableVaccines, "Id", "Name");
+                return View("AddVaccine", model);
             }
 
-            return RedirectToAction("EditPet", new { id = petId });
+            // Check if SelectedVaccineId has a value
+            if (!model.SelectedVaccineId.HasValue || model.SelectedVaccineId.Value == 0)
+            {
+                ModelState.AddModelError("SelectedVaccineId", "Please select a vaccine");
+
+                var availableVaccines = await _context.Vaccines
+                    .Where(v => !_context.PetVaccines
+                        .Any(pv => pv.PetId == model.PetId && pv.VaccineId == v.Id))
+                    .ToListAsync();
+
+                model.AvailableVaccines = new SelectList(availableVaccines, "Id", "Name");
+                return View("AddVaccine", model);
+            }
+
+            // Check if this vaccine is already assigned to this pet
+            var existingPetVaccine = await _context.PetVaccines
+                .AnyAsync(pv => pv.PetId == model.PetId && pv.VaccineId == model.SelectedVaccineId.Value);
+
+            if (existingPetVaccine)
+            {
+                TempData["ErrorMessage"] = "This vaccine has already been administered to this pet.";
+                return RedirectToAction("EditPet", new { id = model.PetId });
+            }
+
+            var petVaccine = new PetVaccine
+            {
+                PetId = model.PetId,
+                VaccineId = model.SelectedVaccineId.Value,
+                DateAdministered = model.DateAdministered
+            };
+
+            _context.PetVaccines.Add(petVaccine);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Vaccine added successfully!";
+            return RedirectToAction("EditPet", new { id = model.PetId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveVaccineFromPet(int petId, int vaccineId)
+        {
+            try
+            {
+                var petVaccine = await _context.PetVaccines
+                    .FirstOrDefaultAsync(pv => pv.PetId == petId && pv.VaccineId == vaccineId);
+
+                if (petVaccine == null)
+                {
+                    return Json(new { success = false, message = "Vaccine assignment not found" });
+                }
+
+                _context.PetVaccines.Remove(petVaccine);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Vaccine removed successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error removing vaccine", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteVaccine(int id)
+        {
+            try
+            {
+                var vaccine = await _context.Vaccines.FindAsync(id);
+                if (vaccine == null)
+                {
+                    TempData["ErrorMessage"] = "Vaccine not found!";
+                    return RedirectToAction(nameof(ManageVaccines));
+                }
+
+                // Check if vaccine is being used by any pets
+                var isInUse = await _context.PetVaccines.AnyAsync(pv => pv.VaccineId == id);
+                if (isInUse)
+                {
+                    TempData["ErrorMessage"] = "Cannot delete vaccine - it is assigned to one or more pets!";
+                    return RedirectToAction(nameof(ManageVaccines));
+                }
+
+                _context.Vaccines.Remove(vaccine);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Vaccine '{vaccine.Name}' deleted successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error deleting vaccine: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(ManageVaccines));
+        }
+
+        // Remove the duplicate RemoveVaccine method - use RemoveVaccineFromPet instead
+
+        [HttpGet]
+        public async Task<IActionResult> GetVaccinesTable()
+        {
+            var vaccines = await _context.Vaccines.OrderBy(v => v.Name).ToListAsync();
+            return PartialView("_VaccinesTablePartial", vaccines);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RefreshVaccineSections(int id)
+        {
+            try
+            {
+                // Get the pet with its vaccines
+                var pet = await _context.Pets
+                    .Include(p => p.PetVaccines)
+                        .ThenInclude(pv => pv.Vaccine)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
+                if (pet == null)
+                {
+                    return Json(new { success = false, message = "Pet not found" });
+                }
+
+                // Get available vaccines (ones not assigned to this pet)
+                var availableVaccines = await _context.Vaccines
+                    .Where(v => !pet.PetVaccines.Any(pv => pv.VaccineId == v.Id))
+                    .ToListAsync();
+
+                // Set ViewBag for the partials
+                ViewBag.PetId = id;
+
+                // Render both partial views to strings
+                var currentVaccinesHtml = await this.RenderViewToStringAsync(
+                    "_CurrentVaccinesPartial",
+                    pet.PetVaccines.ToList());
+
+                var availableVaccinesHtml = await this.RenderViewToStringAsync(
+                    "_AvailableVaccinesPartial",
+                    availableVaccines);
+
+                // Return as JSON
+                return Json(new
+                {
+                    success = true,
+                    currentVaccines = currentVaccinesHtml,
+                    availableVaccines = availableVaccinesHtml
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error refreshing sections", error = ex.Message });
+            }
         }
 
         [HttpGet]
@@ -505,6 +726,18 @@ namespace VeterinaryClinic.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult TestRoute()
+        {
+            return Json(new { message = "AdminController is working!", timestamp = DateTime.Now });
+        }
+
+        [HttpPost]
+        public IActionResult TestPost()
+        {
+            return Json(new { message = "POST to AdminController is working!", timestamp = DateTime.Now });
         }
     }
 }

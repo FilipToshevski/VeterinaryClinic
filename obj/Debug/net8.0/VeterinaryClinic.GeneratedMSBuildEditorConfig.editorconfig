@@ -24,6 +24,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Account/ForgotPasswordConfirmation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxGb3Jnb3RQYXNzd29yZENvbmZpcm1hdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -34,6 +38,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Account/ResetPasswordConfirmation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZXNldFBhc3N3b3JkQ29uZmlybWF0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Admin/AddVaccine.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRkVmFjY2luZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Admin/CreatePet.cshtml]
@@ -62,6 +74,18 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Admin/ManageVaccines.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlVmFjY2luZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Admin/_AvailableVaccinesPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cX0F2YWlsYWJsZVZhY2NpbmVzUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Admin/_CurrentVaccinesPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cX0N1cnJlbnRWYWNjaW5lc1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Admin/_VaccinesTablePartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cX1ZhY2NpbmVzVGFibGVQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lefnu/OneDrive/Desktop/Proekt/VeterinaryClinic/VeterinaryClinic/Views/Home/Index.cshtml]

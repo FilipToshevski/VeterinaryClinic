@@ -11,57 +11,57 @@
         <form asp-action="CreatePet" method="post" id="petCreateForm">
             @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="All" class="alert alert-danger"></div>
+            <!-- Validation Summary - Only shows when there are errors -->
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" style="@(ViewData.ModelState.IsValid ? "display:none;" : "")"></div>
 
             <!-- Owner Dropdown -->
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="OwnerId" class="control-label"></label>
-                <select asp-for="OwnerId" asp-items="Model.OwnerOptions" class="form-control">
+                <select asp-for="OwnerId" asp-items="Model.OwnerOptions" class="form-control select2-owner">
                     <option value="">-- Select Owner --</option>
                 </select>
-                <span asp-validation-for="OwnerId" class="text-danger"></span>
+                <span asp-validation-for="OwnerId" class="text-danger small"></span>
             </div>
 
             <!-- Pet Name -->
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" placeholder="Enter pet name" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <span asp-validation-for="Name" class="text-danger small"></span>
             </div>
 
             <!-- Age -->
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="Age" class="control-label"></label>
                 <input asp-for="Age" type="number" class="form-control" min="0" max="50" />
-                <span asp-validation-for="Age" class="text-danger"></span>
+                <span asp-validation-for="Age" class="text-danger small"></span>
             </div>
 
             <!-- Animal Type -->
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="AnimalType" class="control-label"></label>
-                <select asp-for="AnimalType" asp-items="Model.AnimalTypeOptions" class="form-control">
+                <select asp-for="AnimalType" asp-items="Model.AnimalTypeOptions" class="form-control select2-animal">
                     <option value="">-- Select Animal Type --</option>
                 </select>
-                <span asp-validation-for="AnimalType" class="text-danger"></span>
+                <span asp-validation-for="AnimalType" class="text-danger small"></span>
             </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="SelectedVaccineIds" class="form-label">Vaccines (Optional)</label>
-                <select asp-for="SelectedVaccineIds" asp-items="Model.VaccineOptions"
-                        class="form-control" multiple>
-                    <option value="">-- Select Vaccines --</option>
+            <!-- Vaccines Multi-Select -->
+            <div class="form-group mb-4">
+                <label asp-for="SelectedVaccineIds" class="control-label">Vaccines</label>
+                <select asp-for="SelectedVaccineIds" asp-items="Model.VaccineOptions" class="form-control select2-vaccines" multiple="multiple">
                 </select>
+                <span asp-validation-for="SelectedVaccineIds" class="text-danger small"></span>
             </div>
 
-            <div class="form-group">
+            <div class="form-group d-flex justify-content-between">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Create Pet
                 </button>
-                <a asp-controller="Account" asp-action="Profile" class="btn btn-secondary">
+                <a asp-action="ManagePets" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Back to List
                 </a>
             </div>
-            
         </form>
     </div>
 </div>
@@ -70,9 +70,36 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <!-- Load Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         $(document).ready(function() {
-            $('#petCreateForm').submit(function() {
+            // Initialize select2 for owner dropdown
+            $('.select2-owner').select2({
+                placeholder: "Select an owner",
+                allowClear: true
+            });
+
+            // Initialize select2 for animal type dropdown
+            $('.select2-animal').select2({
+                placeholder: "Select animal type",
+                allowClear: true
+            });
+
+            // Initialize select2 for vaccines multi-select
+            $('.select2-vaccines').select2({
+                placeholder: "Select vaccines",
+                allowClear: true
+            });
+
+            // Form submission handler
+            $('#petCreateForm').on('submit', function(e) {
+                if (!$(this).valid()) {
+                    return false;
+                }
+
                 $('button[type="submit"]').prop('disabled', true)
                     .html('<i class="fas fa-spinner fa-spin"></i> Saving...');
             });

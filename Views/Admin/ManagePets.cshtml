@@ -1,25 +1,39 @@
 ﻿@model VeterinaryClinic.ViewModels.AdminPetsViewModel
 
+@{
+    ViewData["Title"] = "Manage Pets";
+}
+
 <div class="admin-pets-container">
+    <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-paw me-2"></i>Manage All Pets</h2>
-        <a asp-controller="Admin" asp-action="CreatePet" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Add New Pet
-        </a>
-        <a asp-controller="Account" asp-action="Profile" class="btn btn-light">
-            <i class="fas fa-arrow-left me-2"></i> Back to Profile
-        </a>
+        <div>
+            <h2 class="mb-0 text-primary">
+                <i class="fas fa-paw me-2"></i>@ViewData["Title"]
+            </h2>
+            <p class="text-muted mb-0">Manage all registered pets in the system</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Admin" asp-action="CreatePet" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add New Pet
+            </a>
+            <a asp-controller="Account" asp-action="Profile" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back
+            </a>
+        </div>
     </div>
 
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <form method="get" asp-action="ManagePets" class="row g-3">
+    <!-- Search and Filter Card -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form method="get" asp-action="ManagePets" class="row g-3 align-items-end">
                 <div class="col-md-8">
+                    <label class="form-label small text-muted mb-1">Search Pets</label>
                     <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-search"></i>
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-search text-muted"></i>
                         </span>
-                        <input type="text" class="form-control"
+                        <input type="text" class="form-control border-start-0"
                                asp-for="SearchTerm"
                                placeholder="Search by owner, pet name or type...">
                     </div>
@@ -30,34 +44,39 @@
                     </button>
                 </div>
                 <div class="col-md-2">
-                    <a asp-action="ManagePets" class="btn btn-outline-secondary w-100">
-                        <i class="fas fa-times me-2"></i>Clear
+                    <a asp-action="ManagePets" class="btn btn-light w-100">
+                        <i class="fas fa-sync-alt me-2"></i>Reset
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Success Message -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle me-2"></i>
+                <div>@TempData["SuccessMessage"]</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </div>
     }
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <!-- Pets Table Card -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Owner</th>
+                            <th class="ps-4">Owner</th>
                             <th>Email</th>
                             <th>Pet Name</th>
                             <th>Type</th>
                             <th>Age</th>
-                            <th>Actions</th>
+                            <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,21 +85,46 @@
                             @foreach (var pet in owner.Pets)
                             {
                                 <tr>
-                                    <td>@owner.OwnerName</td>
-                                    <td>@owner.OwnerEmail</td>
-                                    <td>@pet.Name</td>
-                                    <td><span class="badge bg-primary">@pet.AnimalType</span></td>
-                                    <td>@pet.Age @(pet.Age == 1 ? "year" : "years")</td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm" role="group">
+                                    <td class="ps-4 align-middle">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-light rounded-circle">
+                                                    <i class="fas fa-user text-primary"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">@owner.OwnerName</h6>
+                                                <small class="text-muted">ID: @owner.OwnerId</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <a href="mailto:@owner.OwnerEmail" class="text-primary">@owner.OwnerEmail</a>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="fw-medium">@pet.Name</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3">
+                                            @pet.AnimalType
+                                        </span>
+                                    </td>
+                                    <td class="align-middle">
+                                        @pet.Age @(pet.Age == 1 ? "year" : "years")
+                                    </td>
+                                    <td class="text-end pe-4 align-middle">
+                                        <div class="d-flex justify-content-end gap-2">
                                             <a asp-controller="Admin" asp-action="EditPet" asp-route-id="@pet.PetId"
-                                               class="btn btn-outline-primary">
-                                                <i class="fas fa-edit"></i>
+                                               class="btn btn-sm btn-outline-primary rounded-circle"
+                                               data-bs-toggle="tooltip" title="Edit">
+                                                <i class="fas fa-pencil-alt"></i>
                                             </a>
                                             <form asp-controller="Admin" asp-action="DeletePet" asp-route-id="@pet.PetId"
-                                                  onsubmit="return confirm('Are you sure you want to delete this pet?');">
-                                                <button type="submit" class="btn btn-outline-danger">
-                                                    <i class="fas fa-trash-alt"></i>
+                                                  onsubmit="return confirm('Are you sure you want to delete @pet.Name?');">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger rounded-circle"
+                                                        data-bs-toggle="tooltip" title="Delete">
+                                                    <i class="far fa-trash-alt"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -92,39 +136,93 @@
                 </table>
             </div>
         </div>
+        <div class="card-footer bg-light py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing @Model.OwnersWithPets.Sum(o => o.Pets.Count) pets
+                </div>
+                <div>
+                    <!-- Pagination would go here -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<style>
-    .admin-pets-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+@section Styles {
+    <style>
+        .admin-pets-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.02);
-    }
+        .table-hover tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.03);
+        }
 
-    .badge {
-        font-size: 0.85em;
-        padding: 5px 8px;
-    }
+        .avatar-sm {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .btn-group-sm > .btn {
-        padding: 0.25rem 0.5rem;
-    }
+        .btn-outline-primary, .btn-outline-danger {
+            --bs-btn-hover-bg: transparent;
+            --bs-btn-active-bg: transparent;
+        }
 
-    .input-group-text {
-        background-color: #f8f9fa;
-    }
+        .rounded-circle {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .table-responsive {
-        max-height: 600px;
-        overflow-y: auto;
-    }
+        .card {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
 
-    .admin-pets-container {
-        max-width: 1400px;
-    }
-</style>
+        .input-group-text {
+            border-right: none;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #dee2e6;
+        }
+
+        .table-responsive {
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa;
+            z-index: 1;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Auto-focus on search input
+            $('input[asp-for="SearchTerm"]').focus();
+
+            // Fade out alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+}
