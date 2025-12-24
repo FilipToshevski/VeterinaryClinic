@@ -560,21 +560,20 @@ namespace VeterinaryClinic.Controllers
                 // Set ViewBag for the partials
                 ViewBag.PetId = id;
 
-                // Render both partial views to strings
-                var currentVaccinesHtml = await this.RenderViewToStringAsync(
-                    "_CurrentVaccinesPartial",
-                    pet.PetVaccines.ToList());
-
-                var availableVaccinesHtml = await this.RenderViewToStringAsync(
-                    "_AvailableVaccinesPartial",
-                    availableVaccines);
-
-                // Return as JSON
+                // Return the data to be used by JavaScript to rebuild the sections
                 return Json(new
                 {
                     success = true,
-                    currentVaccines = currentVaccinesHtml,
-                    availableVaccines = availableVaccinesHtml
+                    petId = id,
+                    currentVaccines = pet.PetVaccines.Select(pv => new {
+                        vaccineId = pv.VaccineId,
+                        vaccineName = pv.Vaccine?.Name,
+                        dateAdministered = pv.DateAdministered.ToShortDateString()
+                    }).ToList(),
+                    availableVaccines = availableVaccines.Select(v => new {
+                        id = v.Id,
+                        name = v.Name
+                    }).ToList()
                 });
             }
             catch (Exception ex)

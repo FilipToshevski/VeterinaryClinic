@@ -133,6 +133,8 @@
     }
         // Replace the JavaScript section in your EditPet view with this:
 
+        // Replace the entire JavaScript section in your EditPet view with this:
+
     <script>
         $(document).ready(function() {
             // Initialize select2 for animal type dropdown
@@ -254,8 +256,15 @@
             $.get('@Url.Action("RefreshVaccineSections", "Admin")', { id: petId })
                 .done(function(response) {
                     if (response.success) {
-                        $('#current-vaccines-section').html(response.currentVaccines);
-                        $('#available-vaccines-section').html(response.availableVaccines);
+                        // Build current vaccines HTML
+                        let currentVaccinesHTML = buildCurrentVaccinesHTML(response.currentVaccines, response.petId);
+
+                        // Build available vaccines HTML
+                        let availableVaccinesHTML = buildAvailableVaccinesHTML(response.availableVaccines, response.petId);
+
+                        // Update the sections
+                        $('#current-vaccines-section .card-body').html(currentVaccinesHTML);
+                        $('#available-vaccines-section .card-body').html(availableVaccinesHTML);
                     } else {
                         showAlert(response.message || 'Error refreshing sections', 'warning');
                     }
@@ -266,7 +275,80 @@
                 });
         }
 
+        function buildCurrentVaccinesHTML(currentVaccines, petId) {
+            if (!currentVaccines || currentVaccines.length === 0) {
+                return '<div class="alert alert-info mb-0">No vaccines assigned yet.</div>';
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Vaccine</th>
+                                <th>Date Administered</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            currentVaccines.forEach(vaccine => {
+                html += `
+                            <tr>
+                                <td>${vaccine.vaccineName || 'Unknown'}</td>
+                                <td>${vaccine.dateAdministered}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            onclick="removeVaccine(${petId}, ${vaccine.vaccineId})">
+                                        <i class="fas fa-trash-alt"></i> Remove
+                                    </button>
+                                </td>
+                            </tr>`;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>`;
+
+            return html;
+        }
+
+        function buildAvailableVaccinesHTML(availableVaccines, petId) {
+            if (!availableVaccines || availableVaccines.length === 0) {
+                return '<div class="alert alert-info mb-0">No vaccines available to add.</div>';
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <tbody>`;
+
+            availableVaccines.forEach(vaccine => {
+                html += `
+                            <tr>
+                                <td>${vaccine.name}</td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                            onclick="addVaccine(${petId}, ${vaccine.id})">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </td>
+                            </tr>`;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>`;
+
+            return html;
+        }
+
         function showAlert(message, type) {
+            // Remove existing alerts
+            $('.alert').remove();
+
             // Create alert element
             const alertClass = `alert-${type}`;
             const iconClass = type === 'success' ? 'fa-check-circle' :
@@ -283,12 +365,12 @@
             // Add alert to the top of the card body
             $('.card-body').first().prepend(alertHTML);
 
-            // Auto-dismiss after 5 seconds
+            // Auto-dismiss after 3 seconds
             setTimeout(function() {
                 $('.alert').fadeOut(function() {
                     $(this).remove();
                 });
-            }, 5000);
+            }, 3000);
         }
     </script>
 }
