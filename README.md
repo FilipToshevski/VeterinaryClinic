@@ -7,10 +7,6 @@ Razor-based server-rendered UI.
 Pet owners can register, manage their profile, and track their pets' vaccine history. Clinic
 admins get a dedicated area to manage owners, pets, and vaccines across the whole clinic.
 
-> This project was originally built in early 2025 and has since gone through a cleanup pass —
-> removing hardcoded credentials, fixing a couple of bugs, and tidying up dead code — to bring it
-> up to a standard worth sharing.
-
 ---
 
 ## Features
