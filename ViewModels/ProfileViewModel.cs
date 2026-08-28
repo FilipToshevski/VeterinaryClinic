@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VeterinaryClinic.Extensions;
 using VeterinaryClinic.Models;
 
 namespace VeterinaryClinic.ViewModels
@@ -26,8 +27,7 @@ namespace VeterinaryClinic.ViewModels
         public DateTime? DateOfBirth { get; set; }
 
         [Display(Name = "Age")]
-        public int? CalculatedAge => DateOfBirth.HasValue ?
-            DateTime.Now.Year - DateOfBirth.Value.Year : null;
+        public int? CalculatedAge => DateOfBirth?.CalculateAge();
 
         public List<PetWithVaccines> Pets { get; set; } = new List<PetWithVaccines>();
 

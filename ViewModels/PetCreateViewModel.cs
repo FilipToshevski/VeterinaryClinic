@@ -25,7 +25,9 @@ namespace VeterinaryClinic.ViewModels
 
         //For dropdown:
       
+        [ValidateNever]
         public SelectList? OwnerOptions { get; set; }
+        [ValidateNever]
         public SelectList? AnimalTypeOptions { get; set; }
 
         [Display(Name = "Vaccines")]

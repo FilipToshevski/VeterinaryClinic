@@ -44,36 +44,50 @@ using (var scope = app.Services.CreateScope())
         }
 
         // Seed admin user
-        var adminEmail = "admin@vetclinic.com"; // Change to your preferred admin email
-        var adminPassword = "Admin@123"; // Change to a strong password
+        // Credentials are never hardcoded. Configure them via user-secrets in development
+        // (dotnet user-secrets set "AdminSeed:Email" "you@example.com")
+        // and via environment variables / a secret store in any other environment
+        // (AdminSeed__Email / AdminSeed__Password).
+        var adminEmail = builder.Configuration["AdminSeed:Email"];
+        var adminPassword = builder.Configuration["AdminSeed:Password"];
 
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        if (adminUser == null)
+        if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
         {
-            adminUser = new Owner
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogWarning(
+                "AdminSeed:Email / AdminSeed:Password are not configured, so no admin account was seeded. " +
+                "Set them with 'dotnet user-secrets set \"AdminSeed:Email\" \"...\"' (and Password) in development.");
+        }
+        else
+        {
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser == null)
             {
-                UserName = adminEmail,
-                Email = adminEmail,
-                FirstName = "Admin",
-                LastName = "User",
-                DateOfBirth = new DateTime(1980, 1, 1),
-                EmailConfirmed = true
-            };
+                adminUser = new Owner
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    FirstName = "Admin",
+                    LastName = "User",
+                    DateOfBirth = new DateTime(1980, 1, 1),
+                    EmailConfirmed = true
+                };
 
-            var createResult = await userManager.CreateAsync(adminUser, adminPassword);
-            if (createResult.Succeeded)
+                var createResult = await userManager.CreateAsync(adminUser, adminPassword);
+                if (createResult.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+                else
+                {
+                    var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    throw new Exception($"Admin user creation failed: {errors}");
+                }
+            }
+            else if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
             {
                 await userManager.AddToRoleAsync(adminUser, "Admin");
             }
-            else
-            {
-                var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
-                throw new Exception($"Admin user creation failed: {errors}");
-            }
-        }
-        else if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
-        {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
         }
     }
     catch (Exception ex)

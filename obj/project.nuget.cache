@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "DN6HScwsrrg=",
+  "dgSpecHash": "n8ITKl2VBzQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\lefnu\\OneDrive\\Desktop\\Proekt\\VeterinaryClinic\\VeterinaryClinic\\VeterinaryClinic.csproj",
+  "projectFilePath": "D:\\ФИНКИ\\Proekt\\VeterinaryClinic\\VeterinaryClinic\\VeterinaryClinic.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\lefnu\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\lefnu\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

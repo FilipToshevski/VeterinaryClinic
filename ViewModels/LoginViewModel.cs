@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace VeterinaryClinic.View_Models
+namespace VeterinaryClinic.ViewModels
 {
     public class LoginViewModel
     {

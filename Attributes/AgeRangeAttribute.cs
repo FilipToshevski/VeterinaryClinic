@@ -1,6 +1,7 @@
 ﻿namespace VeterinaryClinic.Attributes;
 using System;
 using System.ComponentModel.DataAnnotations;
+using VeterinaryClinic.Extensions;
 
 public class AgeRangeAttribute : ValidationAttribute
 {
@@ -17,12 +18,7 @@ public class AgeRangeAttribute : ValidationAttribute
     {
         if (value is DateTime dob)
         {
-            var today = DateTime.Today;
-            var age = today.Year - dob.Year;
-
-            // Adjust age if the birthday hasn't occurred yet this year.
-            if (dob > today.AddYears(-age))
-                age--;
+            var age = dob.CalculateAge();
 
             if (age < _minAge)
             {

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VeterinaryClinic.Data;
 using VeterinaryClinic.Models;
-using VeterinaryClinic.View_Models;
 using VeterinaryClinic.ViewModels;
 
 namespace VeterinaryClinic.Controllers

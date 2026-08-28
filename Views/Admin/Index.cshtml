@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="fas fa-gauge me-2"></i>Admin Dashboard</h2>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-paw fa-2x text-primary mb-3"></i>
+                    <h5 class="card-title">Pets</h5>
+                    <p class="card-text text-muted">View, create, edit, and delete pets and their vaccine records.</p>
+                    <a asp-controller="Admin" asp-action="ManagePets" class="btn btn-primary">Manage Pets</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                    <h5 class="card-title">Owners</h5>
+                    <p class="card-text text-muted">View, create, edit, and delete owner accounts.</p>
+                    <a asp-controller="Admin" asp-action="ManageOwners" class="btn btn-primary">Manage Owners</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-syringe fa-2x text-primary mb-3"></i>
+                    <h5 class="card-title">Vaccines</h5>
+                    <p class="card-text text-muted">View, create, and delete vaccine types available for pets.</p>
+                    <a asp-controller="Admin" asp-action="ManageVaccines" class="btn btn-primary">Manage Vaccines</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

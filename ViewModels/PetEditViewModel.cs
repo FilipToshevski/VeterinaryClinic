@@ -23,9 +23,5 @@ namespace VeterinaryClinic.ViewModels
 
         [ValidateNever]
         public SelectList AnimalTypeOptions { get; set; }
-
-        // Add these to properly handle vaccine forms
-        public int? VaccineToAdd { get; set; }
-        public int? VaccineToRemove { get; set; }
     }
 }

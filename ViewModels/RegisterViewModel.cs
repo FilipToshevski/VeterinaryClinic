@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using VeterinaryClinic.Attributes;
 
-namespace VeterinaryClinic.View_Models
+namespace VeterinaryClinic.ViewModels
 {
     public class RegisterViewModel
     {

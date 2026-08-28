@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using VeterinaryClinic.Controllers;
 using static VeterinaryClinic.ViewModels.ProfileViewModel;
 using System.Linq;
-using YourProjectNamespace.Extensions;
 
 namespace VeterinaryClinic.Controllers
 {
@@ -725,18 +724,6 @@ namespace VeterinaryClinic.Controllers
             }
 
             return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult TestRoute()
-        {
-            return Json(new { message = "AdminController is working!", timestamp = DateTime.Now });
-        }
-
-        [HttpPost]
-        public IActionResult TestPost()
-        {
-            return Json(new { message = "POST to AdminController is working!", timestamp = DateTime.Now });
         }
     }
 }

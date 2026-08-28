@@ -1,1 +1,37 @@
+## .NET / Visual Studio ignore rules
+
+# Build results
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww]in32/
+
+# Visual Studio / Rider / VS Code
 .vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# EF Core / local DB files
+*.mdf
+*.ldf
+*.ndf
+
+# ASP.NET Core secrets (never commit real secrets)
+secrets.json
+appsettings.*.local.json
+
+# OS junk
+.DS_Store
+Thumbs.db
